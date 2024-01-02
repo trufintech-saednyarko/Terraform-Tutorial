@@ -1,0 +1,42 @@
+name: TFLint
+
+on:
+  push:
+    branches:  [master]
+
+jobs:
+  tflint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/cache@v3
+      with:
+        path: ~/.tflint.d/plugins
+        key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+
+    - uses: terraform-linters/setup-tflint@v3
+      with:
+        tflint_version: v0.50.0
+
+    - name: Init TFLint
+      env:
+        GITHUB_TOKEN: ${{ secrets.TF_LINT_PAT }}
+      run: tflint --init -c ./.tflint.hcl  # Load custom ruleset (optional)
+
+    - name: Run TFLint with error handling and visualization
+      run: |
+        tflint --recursive --format json > tflint-results.json || true
+        if [ $(jq '.issues | length' tflint-results.json) -gt 0 ]; then
+          echo "TFLint found issues!"
+          action-checkly --name "TFLint Results" --file tflint-results.json
+          exit 1  # Fail the job
+        fi
+    
+    - name: Run TFLint with reviewdog
+      uses: reviewdog/action-tflint@v1
+      with:
+        github_token: ${{ secrets.TF_LINT_PAT }}
+        reporter: github-pr-review
+
