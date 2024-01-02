@@ -3,6 +3,8 @@ name: TFLint
 on:
   push:
     branches:  [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   tflint:
