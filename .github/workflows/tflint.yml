@@ -29,11 +29,11 @@ jobs:
 
     - name: Run TFLint with error handling and visualization
       run: |
-        tflint --recursive --format json > tflint-results.json
+        tflint --recursive > tflint-results.txt
         exit_code=$?
         if [ $exit_code -ne 0 ]; then
           echo "TFLint found issues!"
-          action-checkly --name "TFLint Results" --file tflint-results.json
+          cat tflint-results.txt
           exit 1  # Fail the job
         fi
     
