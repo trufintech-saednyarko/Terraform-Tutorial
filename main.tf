@@ -16,3 +16,8 @@ resource "aws_cloudwatch_log_group" "yada" {
   kms_key_id = aws_kms_key.key.arn
 
 }
+
+resource "aws_instance" {
+  ami           = "ami-0c94855ba95c574c8"
+  instance_type = "t2.micro"
+}
