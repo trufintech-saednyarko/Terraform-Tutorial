@@ -24,6 +24,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           level: info
           reporter: github-pr-review # Change reporter.
-          filter_mode: added # Change filter mode.
+          filter_mode: file # Change filter mode.
           tflint_version: 'v0.50.0'
           tflint_config: .tflint.hcl
