@@ -19,5 +19,5 @@ resource "aws_cloudwatch_log_group" "yada" {
 
 resource "aws_instance" {
   ami           = "ami-0c94855ba95c574c8"
-  instance_type = "t2.micro"
+  instance_type = "t2.invalid"
 }
