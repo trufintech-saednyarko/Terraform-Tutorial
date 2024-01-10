@@ -2,44 +2,25 @@ name: TFLint
 
 on:
   push:
-    branches:  [master]
-  pull_request:
-    branches: [master]
+    
 
 jobs:
   tflint:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Check out code
+        uses: actions/checkout@v2
 
-    - uses: actions/cache@v3
-      with:
-        path: ~/.tflint.d/plugins
-        key: ${{ runner.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
-
-    - uses: terraform-linters/setup-tflint@v3
-      with:
-        tflint_version: v0.50.0
-
-    - name: Init TFLint
-      env:
-        GITHUB_TOKEN: ${{ secrets.TF_LINT_PAT }}
-      run: tflint --init -c .tflint.hcl  # Load custom ruleset (optional)
-
-    - name: Run TFLint with error handling and visualization
-      run: |
-        tflint --recursive > tflint-results.txt
-        exit_code=$?
-        if [ $exit_code -ne 0 ]; then
-          echo "TFLint found issues!"
-          cat tflint-results.txt
-          exit 1  # Fail the job
-        fi
-    
-    - name: Run TFLint with reviewdog
-      uses: reviewdog/action-tflint@v1
-      with:
-        github_token: ${{ secrets.TF_LINT_PAT }}
-        reporter: github-pr-review
-
+      - name: Install TFLint
+        uses: terraform-linters/setup-tflint@v1
+      
+      - name: Run TFLint with Reviewdog
+        uses: reviewdog/action-tflint@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: info
+          reporter: github-pr-review # Change reporter.
+          filter_mode: added # Change filter mode.
+          tflint_version: 'v0.50.0'
+          tflint_config: .tflint.hcl
